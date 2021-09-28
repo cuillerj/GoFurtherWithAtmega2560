@@ -1,5 +1,5 @@
 void RunServoMotor() {
-  servoMotorClock = !servoMotorClock;
+  servoMotorClock = !servoMotorClock;  // change rotation sense
   int degres = 160;
   if (!servoMotorClock) {
     degres = 20;
@@ -11,6 +11,6 @@ void RunServoMotor() {
 }
 void StopservoMotor() {
   servoTimer = millis();
-  myservo.write(90);
+  myservo.write(90); // center servo position 
   servoRunning = false;
 }

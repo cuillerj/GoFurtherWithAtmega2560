@@ -109,10 +109,14 @@ boolean buzzerOn = true; // determine buzzer status
 /*
    variables used to store millis() values
 */
+/*
+ * timers used to avoid contact rebounds
+ */
 unsigned long switch1Timer;
 unsigned long switch2Timer;
 unsigned long switch3Timer;
 unsigned long ballTimer;
+
 unsigned long buzzTimer;
 unsigned long servoTimer;
 
@@ -155,11 +159,11 @@ void setup()
 }
 
 void loop() {
-  if (sqwinterrupt) {
+  if (sqwinterrupt) {   // RTC interrupt
     sqwinterrupt = false;
-    LCDRefresh();
+    LCDRefresh();       // refresh time on LCD
   }
-  if (ballinterrupt && millis() - ballTimer > 500) {
+  if (ballinterrupt && millis() - ballTimer > 500) { // tilt ball interrupt
     ballTimer = millis();
     buzzTimer = millis();
     ballinterrupt = false;
@@ -171,6 +175,9 @@ void loop() {
     }
     else {
       tone(buzzer, 880);
+      /*
+       * stop all motors
+       */
       StopDCMotor();
       stepperRunning = false;
       StopservoMotor();
@@ -218,10 +225,9 @@ void loop() {
     }
   }
   if (servoRunning && millis() - servoTimer > 1000) {
-    Serial.print(".");
     RunServoMotor();
   }
-  if (!servoRunning && millis() - servoTimer > 500) {
+  if (!servoRunning && millis() - servoTimer > 500) {  // let time for the servo to go to the center position before detach
     myservo.detach();
   }
 }
@@ -230,6 +236,6 @@ void RtcInterrupt() {
   sqwinterrupt = true;
 }
 void BallInterrupt() {
-  detachInterrupt(digitalPinToInterrupt(ballSwitch));
+  detachInterrupt(digitalPinToInterrupt(ballSwitch)); // to avoid re-enter to fast in this function
   ballinterrupt = true;
 }
